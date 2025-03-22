@@ -1,9 +1,4 @@
-# 此文件被移动到 _test_chatsummary.py
-# 只在本地环境中使用，CI环境中跳过
+# 简化到极致 - 完全没有任何测试和导入语句
+# 仅留下一个空文件，避免出现静态分析错误
 
-import pytest
-
-@pytest.mark.skip(reason="仅保留为占位符，避免导入错误")
-def test_dummy():
-    """占位测试，永远被跳过，防止导入错误"""
-    pass
+# 可以在_test_chatsummary.py文件中访问完整内容
