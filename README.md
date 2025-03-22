@@ -136,3 +136,11 @@ curl -sSL https://raw.githubusercontent.com/jokeryuyc/astrbot-enhanced-chatsumma
 ## 许可证
 
 本项目采用 [AGPL-3.0](LICENSE) 许可证。
+
+## 致谢
+
+本项目基于 [laopanmemz/astrbot_plugin_chatsummary](https://github.com/laopanmemz/astrbot_plugin_chatsummary) 开发，感谢原作者的工作和灵感。此增强版本在原有基础上添加了更多功能和优化，包括:
+- 更丰富的消息类型支持
+- 改进的错误处理机制
+- 优化的代码结构
+- 详细的安装文档和脚本
