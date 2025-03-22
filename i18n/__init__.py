@@ -2,7 +2,7 @@
 
 import os
 import json
-from typing import Dict, Optional
+from typing import Dict, Optional, Any
 
 # 支持的语言
 SUPPORTED_LANGUAGES = ['zh_CN', 'en_US']
@@ -40,15 +40,16 @@ class I18n:
                 # 如果加载失败，初始化为空字典
                 self.translations[lang] = {}
     
-    def get(self, key: str, **kwargs) -> str:
+    def get(self, key: str, default: Optional[Any] = None, **kwargs) -> str:
         """获取指定键的翻译
         
         Args:
             key: 翻译键
+            default: 如果翻译不存在，返回的默认值。如果为None，则返回键本身
             **kwargs: 用于格式化的参数
             
         Returns:
-            翻译后的文本。如果找不到翻译，返回键本身
+            翻译后的文本。如果找不到翻译，返回默认值或键本身
         """
         # 获取当前语言的翻译
         translation = self.translations.get(self.lang, {})
@@ -58,10 +59,11 @@ class I18n:
         if text is None and self.lang != DEFAULT_LANGUAGE:
             # 如果当前语言不是默认语言，尝试使用默认语言
             default_translation = self.translations.get(DEFAULT_LANGUAGE, {})
-            text = default_translation.get(key, key)
-        else:
-            # 如果在当前语言中找不到，或者当前语言就是默认语言，则使用键本身
-            text = text or key
+            text = default_translation.get(key)
+        
+        # 如果仍然没有找到翻译，使用默认值或键本身
+        if text is None:
+            text = default if default is not None else key
         
         # 如果有格式化参数，进行格式化
         if kwargs and isinstance(text, str):
@@ -90,9 +92,9 @@ class I18n:
 # 创建默认实例
 _i18n = I18n()
 
-def get(key: str, **kwargs) -> str:
+def get(key: str, default: Optional[Any] = None, **kwargs) -> str:
     """获取翻译的全局方法"""
-    return _i18n.get(key, **kwargs)
+    return _i18n.get(key, default, **kwargs)
 
 def change_language(lang: str) -> bool:
     """更改当前语言的全局方法"""
