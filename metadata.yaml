@@ -5,15 +5,85 @@ help: |
   示例：/消息总结 100
   
   管理员可以使用调试模式：/消息总结 100 debug
+  
+  快速安装指南：
+  1. 使用源码安装（推荐）：
+     git clone https://github.com/jokeryuyc/astrbot-enhanced-chatsummary.git
+     cd astrbot-enhanced-chatsummary
+     pip install -e .
+  
+  2. 一键安装脚本：
+     curl -sSL https://raw.githubusercontent.com/jokeryuyc/astrbot-enhanced-chatsummary/main/install.sh | bash
+  
+  3. 常见问题解决：
+     - 如果出现“找不到包”错误，请使用源码安装方式
+     - 详细安装指南请阅读INSTALL.md文件
+  
+  兼容平台：
+  - 微信、QQ、钉钉、飞书等主流聊天平台
+  - 平台特性具体说明请参考docs/PLATFORM_COMPATIBILITY.md
+  
+  插件配置指南：
+  - 配置文件位于 data/config/ 目录
+  - 详细说明请参考docs/CONFIG.md
 version: v1.0.3
 author: jokeryuyc
 original_author: laopanmemz
 original_repo: https://github.com/laopanmemz/astrbot_plugin_chatsummary
 repo: https://github.com/jokeryuyc/astrbot-enhanced-chatsummary
+platforms:
+  - wechat
+  - qq
+  - dingtalk
+  - feishu
+dependencies:
+  - astrbot>=0.1.0
+  - jinja2>=3.0.0
+  - pyyaml>=6.0.0
+  - typing-extensions>=4.0.0
+  - loguru>=0.6.0
 tags:
   - 聊天
   - 总结
   - LLM
   - 工具
-requirements:
-  - astrbot>=0.1.0
+documentation:
+  - type: 安装指南
+    path: INSTALL.md
+  - type: 配置文档
+    path: docs/CONFIG.md
+  - type: 平台兼容性
+    path: docs/PLATFORM_COMPATIBILITY.md
+  - type: 贡献指南
+    path: CONTRIBUTING.md
+  - type: 更新日志
+    path: CHANGELOG.md
+python_requires: ">=3.8,<3.11"
+commands:
+  - name: 消息总结
+    description: 根据指定数量总结聊天记录
+    usage: /消息总结 [数量] [参数]
+    parameters:
+      - name: 数量
+        type: integer
+        required: true
+        description: 要总结的消息数量
+      - name: 参数
+        type: string
+        required: false
+        description: 可选参数，如debug、语言代码等
+  - name: 每日总结
+    description: 自动总结每天的聊天记录
+    usage: /每日总结 [开启|关闭]
+    parameters:
+      - name: 状态
+        type: string
+        required: false
+        description: 开启或关闭每日总结功能
+installation:
+  method: source
+  url: https://github.com/jokeryuyc/astrbot-enhanced-chatsummary
+  script: https://raw.githubusercontent.com/jokeryuyc/astrbot-enhanced-chatsummary/main/install.sh
+support:
+  issues: https://github.com/jokeryuyc/astrbot-enhanced-chatsummary/issues
+  email: jokeryuyc@example.com
