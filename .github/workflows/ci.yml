@@ -12,6 +12,8 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.8', '3.9', '3.10']
+      # 添加快速失败设置，当一个测试失败时继续运行其他测试
+      fail-fast: false
 
     steps:
     - uses: actions/checkout@v3
@@ -23,12 +25,14 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install pytest coverage pytest-asyncio
+        # 安装基本依赖
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
-        pip install -e .
+        # 使用开发模式安装，但忽略原始依赖（跳过错误）
+        pip install -e . --no-deps
     - name: Test with pytest
       run: |
-        pytest
+        pytest -xvs tests/
     - name: Generate coverage report
       run: |
         coverage run -m pytest
