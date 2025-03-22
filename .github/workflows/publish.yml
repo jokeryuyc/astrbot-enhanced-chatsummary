@@ -1,0 +1,125 @@
+name: Build and Publish Package
+
+on:
+  release:
+    types: [created]
+  workflow_dispatch:
+    inputs:
+      version_bump:
+        description: '版本更新类型'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+        
+    - name: 设置Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        
+    - name: 安装构建工具
+      run: |
+        python -m pip install --upgrade pip
+        pip install build wheel setuptools twine bumpversion
+        
+    - name: 版本更新
+      if: github.event_name == 'workflow_dispatch'
+      run: |
+        # 更新版本号
+        bump_type=${{ github.event.inputs.version_bump }}
+        echo "执行 $bump_type 版本更新"
+        
+        # 更新 metadata.yaml 文件
+        VERSION=$(grep "version:" metadata.yaml | awk '{print $2}')
+        echo "当前版本: $VERSION"
+        
+        # 移除版本号前v
+        VERSION_NO_V=$(echo $VERSION | sed 's/^v//')
+        
+        # 分割版本号
+        MAJOR=$(echo $VERSION_NO_V | cut -d. -f1)
+        MINOR=$(echo $VERSION_NO_V | cut -d. -f2)
+        PATCH=$(echo $VERSION_NO_V | cut -d. -f3)
+        
+        # 根据版本类型更新
+        case $bump_type in
+          patch)
+            PATCH=$((PATCH + 1))
+            ;;
+          minor)
+            MINOR=$((MINOR + 1))
+            PATCH=0
+            ;;
+          major)
+            MAJOR=$((MAJOR + 1))
+            MINOR=0
+            PATCH=0
+            ;;
+        esac
+        
+        NEW_VERSION="v$MAJOR.$MINOR.$PATCH"
+        echo "新版本: $NEW_VERSION"
+        
+        # 更新文件
+        sed -i "s/version: .*/version: $NEW_VERSION/" metadata.yaml
+        
+        # 提交更改
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add metadata.yaml
+        git commit -m "更新版本号至 $NEW_VERSION"
+        git push
+        
+    - name: 构建包
+      run: |
+        python -m build
+        
+    - name: 验证包
+      run: |
+        twine check dist/*
+        
+    - name: 发布到PyPI
+      if: github.event_name == 'release'
+      env:
+        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      run: |
+        twine upload dist/*
+        
+    - name: 发布到TestPyPI
+      if: github.event_name == 'workflow_dispatch'
+      env:
+        TWINE_USERNAME: ${{ secrets.TEST_PYPI_USERNAME }}
+        TWINE_PASSWORD: ${{ secrets.TEST_PYPI_PASSWORD }}
+        TWINE_REPOSITORY_URL: https://test.pypi.org/legacy/
+      run: |
+        twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+        
+    - name: 存储构建结果
+      uses: actions/upload-artifact@v3
+      with:
+        name: dist
+        path: dist/
+        retention-days: 7
+        
+    - name: 创建发布
+      if: github.event_name == 'workflow_dispatch'
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "dist/*"
+        token: ${{ secrets.GITHUB_TOKEN }}
+        tag: "v${{ github.run_number }}"
+        name: "Release v${{ github.run_number }}"
+        draft: true
