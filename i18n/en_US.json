@@ -1,0 +1,12 @@
+{
+  "summary_command_help": "This is a chat summary command",
+  "summary_no_count": "No chat record count provided\nPlease send in the format \"/ message summary [number of chat records to summarize]\"\nFor example \"/ message summary 100\"",
+  "summary_too_many": "The requested number of chat records is too large, maximum support is {max_count}",
+  "summary_no_records": "No valid chat records obtained, please try again later",
+  "summary_no_permission": "You do not have permission to use debug mode",
+  "summary_debug_output": "The prompt has been output to the console via Info Logs. Below is the formatted chat record Debug output:\n{message}",
+  "summary_error": "Message summary failed: {error}",
+  "platform_not_supported": "The current platform does not support message summary function",
+  "fetch_history_error": "Failed to get chat history: {error}",
+  "generate_summary_error": "Failed to generate summary: {error}"
+}

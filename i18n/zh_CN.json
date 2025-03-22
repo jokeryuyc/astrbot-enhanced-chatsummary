@@ -1,0 +1,12 @@
+{
+  "summary_command_help": "这是聊天总结指令",
+  "summary_no_count": "未传入要总结的聊天记录数量\n请按照「 /消息总结 [要总结的聊天记录数量] 」格式发送\n例如「 /消息总结 100 」",
+  "summary_too_many": "请求的聊天记录数量过多，最大支持{max_count}条",
+  "summary_no_records": "未获取到有效的聊天记录，请稍后再试",
+  "summary_no_permission": "您无权使用调试模式",
+  "summary_debug_output": "prompt已通过Info Logs在控制台输出。以下为格式化后的聊天记录Debug输出：\n{message}",
+  "summary_error": "消息总结失败: {error}",
+  "platform_not_supported": "当前平台不支持消息总结功能",
+  "fetch_history_error": "获取聊天记录失败: {error}",
+  "generate_summary_error": "生成总结失败: {error}"
+}
