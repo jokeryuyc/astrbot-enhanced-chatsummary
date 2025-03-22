@@ -1,0 +1,188 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AstrBot 增强版聊天总结插件配置",
+  "description": "用于配置 AstrBot 增强版聊天总结插件的 JSON Schema",
+  "type": "object",
+  "required": [
+    "command_trigger",
+    "default_count",
+    "max_count",
+    "default_language"
+  ],
+  "properties": {
+    "command_trigger": {
+      "type": "string",
+      "description": "触发插件的命令前缀",
+      "default": "/消息总结"
+    },
+    "default_count": {
+      "type": "integer",
+      "description": "默认总结的消息数量",
+      "default": 100,
+      "minimum": 1,
+      "maximum": 1000
+    },
+    "max_count": {
+      "type": "integer",
+      "description": "最大允许总结的消息数量",
+      "default": 500,
+      "minimum": 10,
+      "maximum": 2000
+    },
+    "default_language": {
+      "type": "string",
+      "description": "默认使用的语言",
+      "default": "zh-CN",
+      "enum": ["zh-CN", "en-US", "ja-JP"]
+    },
+    "admin_only": {
+      "type": "boolean",
+      "description": "是否仅允许管理员使用插件",
+      "default": false
+    },
+    "cooldown_seconds": {
+      "type": "integer",
+      "description": "命令冷却时间秒数",
+      "default": 60,
+      "minimum": 0,
+      "maximum": 3600
+    },
+    "enable_logging": {
+      "type": "boolean",
+      "description": "是否启用详细日志",
+      "default": true
+    },
+    "llm": {
+      "type": "object",
+      "description": "LLM 模型调用相关配置",
+      "required": ["provider", "model"],
+      "properties": {
+        "provider": {
+          "type": "string",
+          "description": "LLM 提供商",
+          "enum": ["openai", "anthropic", "gemini", "replicate", "custom"],
+          "default": "openai"
+        },
+        "model": {
+          "type": "string",
+          "description": "使用的模型名称",
+          "default": "gpt-3.5-turbo"
+        },
+        "api_key": {
+          "type": "string",
+          "description": "API 密钥，可使用环境变量格式 ${KEY_NAME}"
+        },
+        "api_base": {
+          "type": "string",
+          "description": "API 基础URL，可自定义端点"
+        },
+        "timeout": {
+          "type": "integer",
+          "description": "API 调用超时时间（秒）",
+          "default": 30,
+          "minimum": 5,
+          "maximum": 300
+        },
+        "max_tokens": {
+          "type": "integer",
+          "description": "最大生成令牌数",
+          "default": 2000,
+          "minimum": 50,
+          "maximum": 16000
+        },
+        "temperature": {
+          "type": "number",
+          "description": "生成温度，越低越确定性",
+          "default": 0.7,
+          "minimum": 0,
+          "maximum": 2
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "description": "输出相关配置",
+      "properties": {
+        "format": {
+          "type": "string",
+          "description": "输出格式",
+          "enum": ["markdown", "text", "html"],
+          "default": "markdown"
+        },
+        "template": {
+          "type": "string",
+          "description": "使用的模板名称",
+          "default": "default"
+        },
+        "max_length": {
+          "type": "integer",
+          "description": "最大输出字符数",
+          "default": 4000,
+          "minimum": 100,
+          "maximum": 10000
+        },
+        "truncate_strategy": {
+          "type": "string",
+          "description": "超出长度时的截断策略",
+          "enum": ["smart", "end", "none"],
+          "default": "smart"
+        }
+      }
+    },
+    "message_filters": {
+      "type": "object",
+      "description": "消息过滤设置",
+      "properties": {
+        "ignore_system": {
+          "type": "boolean",
+          "description": "是否忽略系统消息",
+          "default": true
+        },
+        "ignore_bot": {
+          "type": "boolean",
+          "description": "是否忽略机器人消息",
+          "default": true
+        },
+        "ignore_commands": {
+          "type": "boolean",
+          "description": "是否忽略命令消息",
+          "default": true
+        },
+        "ignore_patterns": {
+          "type": "array",
+          "description": "忽略匹配正则表达式的消息",
+          "items": {
+            "type": "string",
+            "format": "regex"
+          }
+        }
+      }
+    },
+    "debug": {
+      "type": "object",
+      "description": "调试模式设置",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "是否默认启用调试模式",
+          "default": false
+        },
+        "include_raw_messages": {
+          "type": "boolean",
+          "description": "是否包含原始消息详情",
+          "default": true
+        },
+        "include_prompt": {
+          "type": "boolean",
+          "description": "是否包含发送给 LLM 的提示词",
+          "default": true
+        },
+        "include_response": {
+          "type": "boolean",
+          "description": "是否包含 LLM 的原始响应",
+          "default": true
+        }
+      }
+    }
+  }
+}
