@@ -1,3 +1,4 @@
+claude加mcp
 # AstrBot 聊天记录智能总结插件
 
 ![AstrBot](https://img.shields.io/badge/AstrBot-Plugin-blue)
