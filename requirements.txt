@@ -1,0 +1,11 @@
+# Core dependencies
+jinja2>=3.0.0
+marko>=1.2.0
+pydantic>=1.8.0
+typing-extensions>=4.0.0
+loguru>=0.6.0
+
+# Optional dependencies for additional features
+requests>=2.25.0
+beautifulsoup4>=4.9.0
+PyYAML>=6.0
