@@ -1,0 +1,17 @@
+name: astrbot_plugin_chatsummary
+desc: 一个基于LLM的智能历史聊天记录总结插件，支持结构化输出和自定义提示词。
+help: |
+  输入 /消息总结 + [空格] + 要总结的聊天记录数量（仅整数）触发消息总结。
+  示例：/消息总结 100
+  
+  管理员可以使用调试模式：/消息总结 100 debug
+version: v1.0.2
+author: laopanmemz
+repo: https://github.com/jokeryuyc/astrbot-enhanced-chatsummary
+tags:
+  - 聊天
+  - 总结
+  - LLM
+  - 工具
+requirements:
+  - astrbot>=0.1.0
