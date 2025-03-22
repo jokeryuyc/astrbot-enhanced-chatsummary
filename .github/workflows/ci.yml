@@ -41,7 +41,7 @@ jobs:
         pytest -xvs tests/test_i18n.py
     - name: Generate coverage report
       run: |
-        coverage run --source=i18n,main.py,cli.py -m pytest tests/test_basic.py tests/test_i18n.py
+        coverage run --source=i18n,main.py,cli.py -m pytest tests/test_basic.py tests/test_i18n.py || true
         coverage report || true
         coverage xml || true
       continue-on-error: true
