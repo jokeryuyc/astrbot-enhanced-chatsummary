@@ -18,10 +18,11 @@ except:
 
 # 获取依赖项
 requirements = [
-    "astrbot>=0.1.0",
+    # 移除astrbot依赖，因为它可能不在公共PyPI存储库中
     "jinja2>=3.0.0",
     "pyyaml>=6.0.0",
-    "typing-extensions>=4.0.0"
+    "typing-extensions>=4.0.0",
+    "loguru>=0.6.0"
 ]
 
 # 开发依赖项
@@ -60,9 +61,6 @@ setup(
     install_requires=requirements,
     extras_require=extras_require,
     entry_points={
-        "astrbot.plugins": [
-            "astrbot_enhanced_chatsummary=main:EnhancedChatSummary",
-        ],
         "console_scripts": [
             "astrbot-summarize=cli:main",
         ],
