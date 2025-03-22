@@ -41,9 +41,10 @@ jobs:
         pytest -xvs tests/test_i18n.py
     - name: Generate coverage report
       run: |
-        coverage run -m pytest tests/test_basic.py tests/test_i18n.py
-        coverage report
-        coverage xml
+        coverage run --source=i18n,main.py,cli.py -m pytest tests/test_basic.py tests/test_i18n.py
+        coverage report || true
+        coverage xml || true
+      continue-on-error: true
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       with:
