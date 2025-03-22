@@ -1,0 +1,17 @@
+{
+  "language": "en_US",
+  "summary_format": "markdown",
+  "summary_length": "medium",
+  "include_timestamps": true,
+  "include_participants": true,
+  "highlight_keywords": true,
+  "auto_save": false,
+  "save_directory": "./summaries",
+  "max_message_count": 100,
+  "ignore_system_messages": true,
+  "advanced": {
+    "debug_mode": false,
+    "custom_templates_dir": "",
+    "api_timeout": 30
+  }
+}
