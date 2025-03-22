@@ -1,0 +1,11 @@
+项目结构图:
+
+astrbot-enhanced-chatsummary/
+├── LICENSE                           # GNU AGPL v3.0 许可证
+├── README.md                         # 主要文档
+├── metadata.yaml                     # 插件元数据
+├── main.py                           # 插件主代码
+├── setup.py                          # 安装脚本
+└── data/                             # 数据目录
+    └── config/                       # 配置目录
+        └── _conf_schema.json         # 配置模式定义
