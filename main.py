@@ -6,7 +6,7 @@ from astrbot.api.event import filter, AstrMessageEvent
 from astrbot.api.star import Context, Star, register
 from astrbot.api import logger
 
-@register("astrbot_plugin_chatsummary", "laopanmemz", "一个基于LLM的历史聊天记录总结插件", "1.0.2")
+@register("astrbot_plugin_chatsummary", "laopanmemz", "一个基于LLM的历史聊天记录总结插件", "1.0.3")
 class ChatSummary(Star):
     """聊天记录总结插件，使用LLM进行历史消息分析和总结"""
     
@@ -187,15 +187,31 @@ class ChatSummary(Star):
         msg = "\n".join(chat_lines)
         prompt = self._load_prompt()
         
-        # 修复API调用方式，使用系统提示词+用户消息的格式
-        llm_response = await self.context.get_using_provider().text_chat(
-            contexts=[
-                {"role": "system", "content": prompt},
-                {"role": "user", "content": msg}
-            ],
-        )
-        
-        return llm_response.completion_text
+        try:
+            # 尝试使用AstrBot容器格式调用API（优先尝试这种方式，因为这是我们已知的工作方式）
+            try:
+                logger.info("尝试使用AstrBot容器格式API")
+                llm_response = await self.context.get_using_provider().text_chat(
+                    prompt=prompt,
+                    contexts=[
+                        {"role": "user", "content": msg}
+                    ],
+                )
+                return llm_response.completion_text
+            except Exception as e:
+                # 如果AstrBot容器格式失败，记录错误并尝试标准OpenAI格式
+                logger.info(f"AstrBot容器格式调用失败: {str(e)}，尝试使用标准OpenAI格式")
+                llm_response = await self.context.get_using_provider().text_chat(
+                    contexts=[
+                        {"role": "system", "content": prompt},
+                        {"role": "user", "content": msg}
+                    ],
+                )
+                return llm_response.completion_text
+        except Exception as e:
+            # 如果两种方式都失败，记录详细错误并抛出异常
+            logger.error(f"LLM API调用失败: {str(e)}")
+            raise Exception(f"生成总结失败: {str(e)}")
 
     def _load_prompt(self) -> str:
         """
@@ -213,11 +229,11 @@ class ChatSummary(Star):
             else:
                 logger.warning(f"配置文件不存在: {self.config_path}")
                 # 返回默认提示词
-                return "请对以下聊天记录进行总结，提取关键信息，以结构化形式呈现重要通知、讨论话题和有趣互动。"
+                return "- Role: 社群聊天记录总结分析师\n- Background: 你需要对群聊记录进行专业分析，提取关键信息并以美观、生动的格式呈现，帮助用户快速了解群聊精华内容。\n- Requirements:\n  1. 排版美观：使用「·」或「-」作为行前导符，适当使用空行分隔不同部分，保持层级清晰\n  2. 风格生动：避免僵硬的语气，使用生动活泼的表达方式描述群聊内容\n  3. 内容精炼：提取真正重要和有趣的内容，避免冗余\n  4. 符号使用：避免过度使用星号(*)和加粗标记，优先使用简洁的符号\n  5. 结构清晰：使用明确的分类和小标题，但不要过于机械化\n  6. 保持温度：用温暖自然的语气总结，仿佛是群里的一位细心观察者\n- OutputFormat: 按以下结构输出，但确保风格自然流畅：\n  1. 【今日速览】：简短概括群聊主要内容和氛围\n  2. 【热门话题】：按重要性排序的讨论话题，使用简洁的描述和关键要点\n  3. 【趣味时刻】：有趣的互动和金句，注重幽默和亮点\n  4. 【通知与提醒】：如果有任何重要通知或需要注意的事项\n  5. 【闲聊杂谈】：其他值得一提的小话题\n  6. 【群聊温度计】：对整体氛围的简短点评，语气轻松活泼\n- Style: 行文风格应当亲切自然，像是群里的老友在分享今日见闻，避免公式化和机械感。使用适当的表情符号增加活力，但不要过度。"
         except Exception as e:
             logger.error(f"加载提示词出错: {str(e)}")
             # 出错时返回备用提示词
-            return "请对以下聊天记录进行总结，提取关键信息和讨论要点。"
+            return "请对以下聊天记录进行总结，提取关键信息和讨论要点，使用生动自然的语言。"
 
     def _is_admin(self, user_id: str) -> bool:
         """
