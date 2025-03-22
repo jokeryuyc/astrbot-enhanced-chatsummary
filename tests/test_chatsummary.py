@@ -8,8 +8,8 @@ import pytest
 # 添加项目根目录到系统路径
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-# 导入跳过器
-from pytest_skip import skip_without_astrbot
+# 不再导入不存在的模块
+# from pytest_skip import skip_without_astrbot
 
 # 导入要测试的模块
 from main import ChatSummary
@@ -122,17 +122,17 @@ class TestBasicFunctionality(unittest.TestCase):
         self.chat_summary = EnhancedChatSummary(self.mock_context, self.config)
     
     def test_initialization(self):
-        """\u6d4b\u8bd5\u521d\u59cb\u5316"""
+        """测试初始化"""
         self.assertEqual(self.chat_summary.max_records, 100)
         self.assertFalse(self.chat_summary.debug_mode)
         self.assertEqual(self.chat_summary.i18n.lang, "en_US")
     
     def test_extract_message_text(self):
-        """\u6d4b\u8bd5\u6d88\u606f\u6587\u672c\u63d0\u53d6\u529f\u80fd"""
+        """测试消息文本提取功能"""
         # 测试文本消息
         text_message = [{'type': 'text', 'data': {'text': 'Test message'}}]
         result = self.chat_summary._extract_message_text(text_message)
-        self.assertEqual(result, 'Test message ', "\u6587\u672c\u6d88\u606f\u63d0\u53d6\u5931\u8d25")
+        self.assertEqual(result, 'Test message ', "文本消息提取失败")
 
 if __name__ == '__main__':
     unittest.main()
