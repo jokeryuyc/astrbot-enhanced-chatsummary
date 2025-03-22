@@ -1,55 +1,140 @@
-name: CI
+name: CI/CD Pipeline
 
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        description: '是否开启调试模式'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
-  test:
+  lint-and-test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ['3.8', '3.9', '3.10']
-      # 添加快速失败设置，当一个测试失败时继续运行其他测试
       fail-fast: false
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: 检出代码
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+        
+    - name: 设置Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
+        cache: 'pip'
+        
+    - name: 安装依赖
       run: |
         python -m pip install --upgrade pip
-        pip install pytest coverage pytest-asyncio
+        pip install pytest pytest-cov pytest-asyncio flake8 black mypy
         # 安装基本依赖
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
         # 使用开发模式安装，但忽略原始依赖（跳过错误）
         pip install -e . --no-deps
-    - name: Show installed packages
+        
+    - name: 显示安装的包
       run: |
         pip list
-    # 如果 test_chatsummary.py 文件存在，则重命名它以避免测试收集
-    - name: Rename problematic test file
+        
+    - name: 代码格式检查
+      run: |
+        black --check --diff . || echo "Black formatting check failed but continuing"
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=.git,__pycache__,tests/_* || echo "Flake8 check failed but continuing"
+        
+    - name: 重命名问题测试文件
       run: |
         if [ -f tests/test_chatsummary.py ]; then
           mv tests/test_chatsummary.py tests/_skip_test_chatsummary.py
         fi
-    - name: Test with pytest (specific tests only)
+        
+    - name: 运行测试
       run: |
         pytest -xvs tests/test_basic.py tests/test_i18n.py
-    - name: Generate coverage report
+        
+    - name: 生成覆盖率报告
       run: |
         coverage run --source=i18n,main.py,cli.py -m pytest tests/test_basic.py tests/test_i18n.py || true
         coverage report || true
         coverage xml || true
       continue-on-error: true
-    - name: Upload coverage to Codecov
+      
+    - name: 上传覆盖率报告到Codecov
       uses: codecov/codecov-action@v3
       with:
         file: ./coverage.xml
         fail_ci_if_error: false
+        
+    - name: 缓存测试结果
+      uses: actions/cache@v3
+      with:
+        path: |
+          .coverage
+          coverage.xml
+        key: ${{ runner.os }}-test-results-${{ matrix.python-version }}-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-test-results-${{ matrix.python-version }}-
+
+  build-and-verify:
+    needs: lint-and-test
+    runs-on: ubuntu-latest
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v3
+      
+    - name: 设置Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        
+    - name: 安装构建工具
+      run: |
+        python -m pip install --upgrade pip
+        pip install build wheel setuptools twine check-manifest
+        
+    - name: 验证项目结构
+      run: |
+        check-manifest || echo "Manifest check failed but continuing"
+        
+    - name: 构建包
+      run: |
+        python -m build
+        
+    - name: 验证包
+      run: |
+        twine check dist/*
+        
+    - name: 存储构建结果
+      uses: actions/upload-artifact@v3
+      with:
+        name: dist
+        path: dist/
+        retention-days: 7
+        
+  documentation:
+    needs: lint-and-test
+    runs-on: ubuntu-latest
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v3
+      
+    - name: 验证文档完整性
+      run: |
+        # 检查所有必要的文档文件是否存在
+        for doc in README.md INSTALL.md CONTRIBUTING.md LICENSE CHANGELOG.md; do
+          if [ ! -f "$doc" ]; then
+            echo "\u7f3a失必要的文档文件: $doc"
+            exit 1
+          fi
+        done
+        echo "\u6587档完整性检查通过"
