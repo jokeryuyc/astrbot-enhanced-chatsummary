@@ -1,8 +1,9 @@
+# 此文件被移动到 _test_chatsummary.py
+# 只在本地环境中使用，CI环境中跳过
+
 import pytest
 
-# 简化测试文件，确保它不会阻止CI运行
-
-@pytest.mark.skip(reason="Skip AstrBot specific tests in CI environment")
-def test_simple():
-    """简单的留存测试函数，始终被跳过"""
-    assert True
+@pytest.mark.skip(reason="仅保留为占位符，避免导入错误")
+def test_dummy():
+    """占位测试，永远被跳过，防止导入错误"""
+    pass
