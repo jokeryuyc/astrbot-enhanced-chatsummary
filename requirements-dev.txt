@@ -1,4 +1,20 @@
-pytest>=7.0.0
-pytest-asyncio>=0.18.0
-pytest-cov>=3.0.0
-coverage>=6.3.0
+# Testing dependencies
+pytest>=6.0.0
+pytest-asyncio>=0.16.0
+pytest-cov>=2.12.0
+coverage>=6.0.0
+
+# Linting and code style
+pylint>=2.8.0
+black>=21.5b0
+flake8>=3.9.0
+isort>=5.9.0
+mypy>=0.812
+
+# Dev tools
+tox>=3.24.0
+bumpversion>=0.6.0
+
+# Documentation
+Sphinx>=4.0.0
+sphinx-rtd-theme>=0.5.0
